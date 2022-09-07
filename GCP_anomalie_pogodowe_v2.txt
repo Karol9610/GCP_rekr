@@ -48,7 +48,7 @@ cte2.czy_padalo_poprzedniego_dnia,
 --case when czy_padalo - czy_padalo_poprzedniego_dnia = 1        then 1 else 0 end as czy_anomalia_warunek1,
 --case when (temperature - srednia_temperatury_4_dni) <= 5       then 1 else 0 end as czy_anomalia_warunek3,
 --case when precipitation > srednia_opadow_7_dni                 then 1 else 0 end as czy_anomalia_warunek2,
-case when czy_padalo_poprzedniego_dnia = 0 and (temperature - srednia_temperatury_4_dni) <= 5 and precipitation > srednia_opadow_7_dni  then 1 else 0 end as czy_anomalia
+case when czy_padalo_poprzedniego_dnia = 0 and (temperature - srednia_temperatury_4_dni) <= -5 and precipitation > srednia_opadow_7_dni  then 1 else 0 end as czy_anomalia
 -- ewentualnie można dodać warunek żeby nie liczyło pierwszych dni w danym podzbiorze
 
 from cte2
