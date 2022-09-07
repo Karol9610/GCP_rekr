@@ -1,0 +1,65 @@
+with cte as
+(
+  
+SELECT
+  PARSE_DATE('%Y%m%d', CONCAT(year,mo,da)) AS data_obserwacji,
+  name,
+  year,
+  mo as month,
+  da as day,
+  case when prcp = 0.00 or prcp= 99.99 then 0.00 else prcp end as precipitation, case when prcp = 0.00 or prcp =99.99 then 0 else 1 end as czy_padalo,
+  temp as temperature
+FROM `bigquery-public-data.noaa_gsod.gsod2000` as a
+inner join
+ (
+SELECT
+ usaf,
+ name 
+FROM `bigquery-public-data.noaa_gsod.stations` 
+where country = 'PL'
+) as abc on a.stn = abc.usaf
+
+),
+
+cte2 as
+(
+
+select
+  --EXTRACT(ISOWEEK FROM data_obserwacji ) AS tydzien,
+  data_obserwacji,
+  name,
+  czy_padalo,
+  LAG(czy_padalo) OVER(PARTITION BY name ORDER BY data_obserwacji) as czy_padalo_poprzedniego_dnia,
+  temperature,
+  precipitation,
+  AVG(precipitation) OVER(PARTITION BY name ORDER BY data_obserwacji ROWS  7 PRECEDING ) as srednia_opadow_7_dni,
+  AVG(temperature) OVER(PARTITION BY name ORDER BY data_obserwacji ROWS  4 PRECEDING ) as srednia_temperatury_4_dni,
+
+ from cte 
+ --limit 5
+),
+cte3 as
+(
+
+Select 
+data_obserwacji,
+name,
+cte2.czy_padalo_poprzedniego_dnia,
+--case when czy_padalo - czy_padalo_poprzedniego_dnia = 1        then 1 else 0 end as czy_anomalia_warunek1,
+--case when (temperature - srednia_temperatury_4_dni) <= 5       then 1 else 0 end as czy_anomalia_warunek3,
+--case when precipitation > srednia_opadow_7_dni                 then 1 else 0 end as czy_anomalia_warunek2,
+case when czy_padalo_poprzedniego_dnia = 0 and (temperature - srednia_temperatury_4_dni) <= 5 and precipitation > srednia_opadow_7_dni  then 1 else 0 end as czy_anomalia
+-- ewentualnie można dodać warunek żeby nie liczyło pierwszych dni w danym podzbiorze
+
+from cte2
+
+)
+select
+name, sum(czy_anomalia) as liczba_anomalii
+from cte3
+group by name
+order by liczba_anomalii desc
+
+
+
+
