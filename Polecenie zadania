@@ -1,0 +1,8 @@
+GCP- bigquerry - zapytanie które zwróci:
+nagłe załamania w stacjach pogodowych w Polsce w roku 2000.
+
+Przez nagłe załamanie pogody rozumiemy:
+
+pierwszy dzień jest bez opadów atmosferycznych,
+następny dzień z opadami większymi niż średnia krocząca za ostatnie 7 dni (tydzień) oraz temperatura niższa o conajmniej 5 stopni niż temperatura za ostatnie 4 dni. 
+Która stacja pogodowa w Polsce miała najwięcej  załamań i ile ich było w ciągu roku?
